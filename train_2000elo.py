@@ -23,18 +23,18 @@ stockfish = Stockfish("stockfish/stockfish",
                                     "Minimum Thinking Time": 20,
                                     "Hash": 256}, depth=15)
 
-input = keras.Input(shape=(12, 8, 8), name='board')
-x = layers.Conv2D(128, 5, padding='same', activation='relu')(input)
-x = layers.Conv2D(128, 3, padding='same', activation='relu')(x)
-tmp = layers.Conv2D(73, 1, padding='valid', activation='relu')(x)
-p = layers.Dense(8*8*73, activation='softmax', name='p')(keras.layers.Flatten()(tmp))
-v = layers.Dense(1, activation='tanh', name='v')(keras.layers.Flatten()(x))
+input = keras.Input(shape=(12, 8, 8), name="board")
+x = layers.Conv2D(128, 5, padding="same", activation="relu")(input)
+x = layers.Conv2D(128, 3, padding="same", activation="relu")(x)
+tmp = layers.Conv2D(73, 1, padding="valid", activation="relu")(x)
+p = layers.Dense(8*8*73, activation="softmax", name="p")(keras.layers.Flatten()(tmp))
+v = layers.Dense(1, activation="tanh", name="v")(keras.layers.Flatten()(x))
 model = keras.Model(
     inputs=[input],
     outputs=[p, v],
 )
 model.compile(
-    optimizer='adam',
+    optimizer="adam",
     loss=[
         keras.losses.CategoricalCrossentropy(),
         keras.losses.MeanSquaredError(),
@@ -53,9 +53,9 @@ if mfile.is_file():
 
 afile = Path(accuracy_file)
 if not mfile.is_file():
-    open(accuracy_file, 'w').close()
+    open(accuracy_file, "w").close()
 
-env = gym.make('ChessAlphaZero-v0')
+env = gym.make("ChessAlphaZero-v0")
 
 def getResult(str):
     if str == "0-1":
@@ -81,7 +81,7 @@ training_policies = []
 training_results = []
 
 while True:
-    print("-------------------------------------")
+    print("-"*50)
     print("TURN: ", turn)
     white_move, policy = player.mcts(board, 50, True)
     training_positions.append(player.boardToBitBoard(board))
@@ -113,7 +113,7 @@ while True:
 
     scores.append(score_after-score_before)
 
-    print('white move ', white_move)
+    print("white move ", white_move)
     print("White:")
     print(board)
 
@@ -127,9 +127,9 @@ while True:
             training_positions.append(player.boardToBitBoard(board))
             training_policies.append(generate_policy(black_move_a))
         except:
-            print('move not decoding: ', black_move)
+            print("move not decoding: ", black_move)
 
-        print('black move ', black_move)
+        print("black move", black_move)
         player.play_move(board, black_move)
         board.push(black_move)
 
@@ -145,14 +145,13 @@ while True:
         # calculate move +/-
         avg = int(np.mean(scores))
         # write move accuracy to file
-        f = open(accuracy_file, 'r+')
-        lines = f.readlines()
-        matches = len(lines)
-        # format is: match:turns:w/l:move+/-:moveaccuracy
-        f.write('\n'+str(matches)+':'+str(turn)+':'+str(board.result())+':'+str(avg)+':'+str(move_percentage))
-        f.close()
+        with open(accuracy_file, "r+") as f:
+            lines = f.readlines()
+            matches = len(lines)
+            # format is: match:turns:w/l:move+/-:moveaccuracy
+            f.write(f"{matches}:{turn}:{board.result()}:{avg}:{move_percentage}\n")
 
-        training_results = [ getResult(board.result()) for pos in training_positions ]
+        training_results = [ getResult(board.result()) for _ in training_positions ]
 
         training_positions = np.asarray(training_positions)
         training_policies = np.asarray(training_policies)
