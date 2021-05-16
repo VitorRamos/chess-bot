@@ -1,6 +1,4 @@
 import gym
-import gym_chess
-import random
 import numpy as np
 import tensorflow as tf
 import chess
@@ -11,9 +9,13 @@ from tensorflow.keras import layers
 from flask import Flask, Response, request
 import time
 
+config = tf.compat.v1.ConfigProto()
+config.gpu_options.allow_growth = True
+session = tf.compat.v1.Session(config=config)
+
 env = gym.make('ChessAlphaZero-v0')
 env.reset()
-model = keras.models.load_model("./models/modelGmGames.h5")
+model = keras.models.load_model("./models/modelStockfish2000EloGames.h5")
 pieceTypes = {"None" : -1, "P" : 0, "N" : 1, "B": 2, "R" : 3 , "Q" : 4, "K" : 5, "p" : 6, "n" : 7, "b" : 8, "r" : 9, "q" : 10
 , "k" : 11}
 def boardToBitBoard(board):
