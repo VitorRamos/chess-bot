@@ -1,15 +1,11 @@
 import gym
-from gym_chess.alphazero import MoveEncoding
-import random
+import gym_chess.alphazero
 import math
 import copy
 import numpy as np
-import tensorflow as tf
 import chess
 import chess.pgn
 import chess.svg
-from tensorflow import keras
-from tensorflow.keras import layers
 
 class MCTS:
     pieceTypes = {"None" : -1, "P" : 0, "N" : 1, "B": 2, "R" : 3 , "Q" : 4, "K" : 5, "p" : 6, "n" : 7, "b" : 8, "r" : 9, "q" : 10, "k" : 11}
